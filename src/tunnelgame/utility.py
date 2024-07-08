@@ -1,6 +1,6 @@
 from string import Formatter
 
-from tunnelvision import addressing
+from tunnelgame import addressing
 
 
 class CustomFormatter(Formatter):

@@ -1,4 +1,4 @@
-from tunnelvision.gameloop import run
+from tunnelgame.gameloop import run
 
 
 def main():

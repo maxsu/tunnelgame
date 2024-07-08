@@ -3,8 +3,8 @@ import copy
 from pathlib import Path
 import pickle
 
-from tunnelvision import addressing, interpreter, gameparser, utility
-from tunnelvision.config import saves, max_num_steps, choices_between_autosaves
+from tunnelgame import addressing, interpreter, gameparser, utility
+from tunnelgame.config import saves, max_num_steps, choices_between_autosaves
 
 def run(game_name):
     gameparser.open_game(game_name)

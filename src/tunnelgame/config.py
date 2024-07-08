@@ -1,7 +1,7 @@
 from pathlib import Path
 import yaml
 
-from tunnelvision import (
+from tunnelgame import (
     gameloop,
     interpreter,
     utility,

@@ -1,9 +1,9 @@
 from flask import Flask, render_template
 import os
-from pathlib import Path # TODO: Move this back into config, currently hotfix to prevent circular dependency
-import subprocess # TODO: Add to dependencies?
+from pathlib import Path  # TODO: Move this back into config, currently hotfix to prevent circular dependency
+import subprocess  # TODO: Add to dependencies?
 import textwrap
-from tunnelvision import utility
+from tunnelgame import utility
 
 feedback_msg = {
     "could_not_load_autosave": "Could not revert to autosave",
@@ -36,7 +36,8 @@ feedback_msg = {
 
 old_print = print
 
-def print(text = ""):
+
+def print(text=""):
     state["displayed_text"] += str(text) + "\n"
     old_print(text)
 
@@ -55,7 +56,7 @@ class CLIView:
     ######################################################################
 
     # Clears console and story view
-    def clear(self, dont_reset_displayed_text = False):
+    def clear(self, dont_reset_displayed_text=False):
         if not dont_reset_displayed_text:
             state["displayed_text"] = ""
         os.system("clear")
@@ -63,7 +64,7 @@ class CLIView:
     # Reprints displayed text for save/loads
     def print_displayed_text(self):
         old_print(state["displayed_text"], end="")
-    
+
     ######################################################################
     # Story board
     ######################################################################
@@ -154,10 +155,12 @@ class CLIView:
                         sign = "+"
                     if spec_type == "req_spec" or spec_type == "cost_spec":
                         sign = ""
-                    effects_text += f"{sign}{expr_val} {utility.localize(modification["var"], choice["choice_address"])}, "
+                    localized_var = utility.localize(modification["var"], choice["choice_address"])
+                    effects_text += f"{sign}{expr_val} {localized_var}, "
                 effects_text = effects_text[:-2]
                 effects_text += "]"
                 return effects_text
+
             effects_text = ""
             if "cost_spec" in choice and len(choice["cost_spec"]) > 0:
                 effects_text += parse_modification_spec(choice, choice["cost_spec"], "cost_spec")
@@ -167,7 +170,7 @@ class CLIView:
                 effects_text += parse_modification_spec(choice, choice["shown_spec"], "shown_spec")
 
             choice_color = "\033[32m"
-            text_color = "\033[0m" # This appears to actually just be the color for the initial * in a choice?
+            text_color = "\033[0m"  # This appears to actually just be the color for the initial * in a choice?
             if "missing" in choice and len(choice["missing"]) > 0:
                 choice_color = "\033[90m"
                 text_color = "\033[90m"
@@ -192,7 +195,7 @@ class CLIView:
                 missing_text = missing_text[:-2]
                 print(missing_text + "\033[0m")
 
-    def print_feedback_message(self, msg_type, dont_save = False):
+    def print_feedback_message(self, msg_type, dont_save=False):
         if dont_save:
             if not (msg_type in feedback_msg):
                 old_print(feedback_msg["default"])
@@ -254,7 +257,7 @@ class ViewForTesting:
     def clear(self):
         self.commands_called.append({"id": "clear"})
 
-    def print_choices(self, display_actions = False):
+    def print_choices(self, display_actions=False):
         self.commands_called.append({"id": "print_choices"})
 
     def print_feedback_message(self, msg_type):
@@ -294,22 +297,23 @@ class ViewForTesting:
         self.num_choices_made += 1
         return self.choice_list[self.num_choices_made - 1].split()
 
+
 class JavaView:
     def __init__(self):
         local_dir = Path(__file__).parent
-        compile_result = subprocess.run(["javac", local_dir / "tunnelvision" / "src" / "main" / "java" / "com" / "example" / "tunnelvision" / "JavaView.java"])
+        compile_result = subprocess.run(["javac", local_dir / "tunnelgame" / "src" / "main" / "java" / "com" / "example" / "tunnelgame" / "JavaView.java"])
 
         # Check that it compiled
         if compile_result.returncode != 0:
             raise Exception
 
         self.process = subprocess.Popen(
-            ['java', 'com.example.tunnelvision.JavaView'],
-            cwd=str(local_dir / "tunnelvision" / "src" / "main" / "java"),
+            ["java", "com.example.tunnelgame.JavaView"],
+            cwd=str(local_dir / "tunnelgame" / "src" / "main" / "java"),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True  # Ensures text mode for stdin/stdout
+            text=True,  # Ensures text mode for stdin/stdout
         )
 
     def send_message(self, text):
@@ -321,25 +325,25 @@ class JavaView:
     ######################################################################
 
     # Clears console and story view
-    def clear(self, dont_reset_displayed_text = False):
+    def clear(self, dont_reset_displayed_text=False):
         self.send_message("clear:")
 
     # Reprints displayed text for save/loads
     def print_displayed_text(self):
-        pass # TODO
-    
+        pass  # TODO
+
     ######################################################################
     # Story board
     ######################################################################
 
     def print_flavor_text(self, text):
-        pass # TODO
+        pass  # TODO
 
     def print_separator(self):
-        pass # TODO
+        pass  # TODO
 
     def print_table(self, tbl_to_display):
-        pass # TODO
+        pass  # TODO
 
     def print_text(self, text, style=""):
         self.send_message(f"print:{text}")
@@ -349,10 +353,10 @@ class JavaView:
     ######################################################################
 
     def print_stat_change(self, text):
-        pass # TODO
+        pass  # TODO
 
     def print_var_modification(self, text_to_show_spec):
-        pass # TODO
+        pass  # TODO
 
     ######################################################################
     # Console
@@ -365,20 +369,20 @@ class JavaView:
 
         self.send_message(f"choice:{choice_string[:-1]}")
 
-    def print_feedback_message(self, msg_type, dont_save = False):
-        pass # TODO
+    def print_feedback_message(self, msg_type, dont_save=False):
+        pass  # TODO
 
     def print_settings(self):
-        pass # TODO
+        pass  # TODO
 
     def print_settings_flavor_text_get(self):
-        pass # TODO
+        pass  # TODO
 
     def print_settings_flavor_text_set(self, new_value):
-        pass # TODO
+        pass  # TODO
 
     def print_var_value(self, var_value):
-        pass # TODO
+        pass  # TODO
 
     def get_input(self) -> str:
         while True:
@@ -389,14 +393,15 @@ class JavaView:
             except Exception:
                 pass
 
+
 class WebView:
     def __init__(self):
         self.app = Flask(__name__)
         self.setup_routes()
         self.app.run(port=5001, debug=True)
-    
+
     def setup_routes(self):
-        @self.app.route('/')
+        @self.app.route("/")
         def create_webpage():
             return render_template("index.html")
 
@@ -405,60 +410,60 @@ class WebView:
     ######################################################################
 
     # Clears console and story view
-    def clear(self, dont_reset_displayed_text = False):
-        pass # TODO
+    def clear(self, dont_reset_displayed_text=False):
+        pass  # TODO
 
     # Reprints displayed text for save/loads
     def print_displayed_text(self):
-        pass # TODO
-    
+        pass  # TODO
+
     ######################################################################
     # Story board
     ######################################################################
 
     def print_flavor_text(self, text):
-        pass # TODO
+        pass  # TODO
 
     def print_separator(self):
-        pass # TODO
+        pass  # TODO
 
     def print_table(self, tbl_to_display):
-        pass # TODO
+        pass  # TODO
 
     def print_text(self, text, style=""):
-        pass # TODO
+        pass  # TODO
 
     ######################################################################
     # Stats board
     ######################################################################
 
     def print_stat_change(self, text):
-        pass # TODO
+        pass  # TODO
 
     def print_var_modification(self, text_to_show_spec):
-        pass # TODO
+        pass  # TODO
 
     ######################################################################
     # Console
     ######################################################################
 
     def print_choices(self, display_actions=False):
-        pass # TODO
+        pass  # TODO
 
-    def print_feedback_message(self, msg_type, dont_save = False):
-        pass # TODO
+    def print_feedback_message(self, msg_type, dont_save=False):
+        pass  # TODO
 
     def print_settings(self):
-        pass # TODO
+        pass  # TODO
 
     def print_settings_flavor_text_get(self):
-        pass # TODO
+        pass  # TODO
 
     def print_settings_flavor_text_set(self, new_value):
-        pass # TODO
+        pass  # TODO
 
     def print_var_value(self, var_value):
-        pass # TODO
+        pass  # TODO
 
     def get_input(self) -> str:
-        pass # TODO
+        pass  # TODO

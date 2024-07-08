@@ -1,8 +1,8 @@
 import yaml
 import random
 
-from tunnelvision import addressing, gameparser, utility
-from tunnelvision.config import stories
+from tunnelgame import addressing, gameparser, utility
+from tunnelgame.config import stories
 
 
 class ErrorNode(Exception):

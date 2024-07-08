@@ -1,17 +1,10 @@
 {
     "configurations": [
-        {
-            "name": "Python Debugger: Module",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "tunnelvision"
-        },
-        {
-            "type": "java",
-            "name": "Java Debugger",
-            "request": "launch",
-            "mainClass": "com.example.tunnelvision.JavaView",
-            "projectName": "tunnelvision"
-        }
+      {
+        "name": "Python Debugger: Module",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "tunnelgame"
+      }
     ]
 }

@@ -4,11 +4,11 @@
 
 # In test_gameloop.py
 import pytest
-from tunnelvision import config
-from tunnelvision.config import stories
-from tunnelvision.gameloop import run
-from tunnelvision.interpreter import ErrorNode
-from tunnelvision.view import ViewForTesting
+from tunnelgame import config
+from tunnelgame.config import stories
+from tunnelgame.gameloop import run
+from tunnelgame.interpreter import ErrorNode
+from tunnelgame.view import ViewForTesting
 
 ######################################################################
 # fixtures

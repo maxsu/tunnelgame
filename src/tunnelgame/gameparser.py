@@ -4,9 +4,9 @@ import math
 import random
 import yaml
 
-from tunnelvision import addressing
-from tunnelvision.config import grammar, stories
-from tunnelvision.utility import *  # TODO: Make it not import *, use proper namespace
+from tunnelgame import addressing
+from tunnelgame.config import grammar, stories
+from tunnelgame.utility import *  # TODO: Make it not import *, use proper namespace
 
 # TODO: Check addresses in program are valid
 
