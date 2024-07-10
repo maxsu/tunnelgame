@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ${{matrix.runner}}
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            asset: tunnelgame.sh
+          - runner: windows-latest
+            asset: tunnelgame.exe
+          - runner: macos-latest
+            asset: tunnelgame.zip
+            app: tunnelgame.app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Build with PyInstaller
+        run: pyinstaller tunnelgame.spec
+      
+      - name: Compress .app file
+        if: matrix.runner == 'macos-latest'
+        run: cd dist; zip -r tunnelgame.zip tunnelgame.app
+
+      - name: Inspect dist directory
+        run: cd dist; ls; file *; file --mime-type *; stat *
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{matrix.asset}}
+          path: dist/${{matrix.asset}}
