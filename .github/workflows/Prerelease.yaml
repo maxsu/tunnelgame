@@ -1,0 +1,27 @@
+name: Prerelease
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+
+env:
+    GH_TOKEN: ${{github.token}}  # Authenticate gh
+
+jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        run: gh run download -p '*' -D artifacts/
+
+      - name: Delete old prelease
+        run: gh release delete prerelease --cleanup-tag -y
+
+      - name: Create a new prerelease
+        run: gh release create prerelease artifacts/*
+
