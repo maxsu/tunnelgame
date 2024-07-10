@@ -4,9 +4,9 @@
 
 # In test_gameloop.py
 import pytest
+from tunnelgame.gameloop import run
 from tunnelgame import config
 from tunnelgame.config import stories
-from tunnelgame.gameloop import run
 from tunnelgame.interpreter import ErrorNode
 from tunnelgame.view import ViewForTesting
 

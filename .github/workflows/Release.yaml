@@ -1,0 +1,87 @@
+name: Build and package every pre-release commit
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{steps.create_release.outputs.upload_url}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: pre-release-${{github.sha}}
+          release_name: pre-release-${{github.sha}}
+          body: |
+            Artifacts for the latest commit on branch ${{github.ref_name}}.
+          draft: false
+          prerelease: true
+
+  build:
+    needs: create-release
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: tunnelgame.sh
+            mime: application/x-executable
+          - os: windows-latest
+            asset: tunnelgame.exe
+            mime: application/octet-stream
+          - os: macos-latest
+            app: tunnelgame.app
+            asset: tunnelgame.zip
+            mime: application/zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Build with PyInstaller
+        run: pyinstaller tunnelgame.spec
+      
+      - name: Compress .app file
+        if: matrix.os == 'macos-latest'
+        run: zip -r dist/${{matrix.asset}} dist/${{matrix.app}}
+
+      - name: Inspect dist directory
+        run: |
+          ls dist/
+          file dist/*
+          file --mime-type dist/*
+          stat dist/*
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{matrix.asset}}
+          path: dist/${{matrix.asset}}
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{needs.create-release.outputs.upload_url}}
+          asset_name: ${{matrix.asset}}
+          asset_path: dist/${{matrix.asset}}
+          asset_content_type: ${{matrix.mime}}
