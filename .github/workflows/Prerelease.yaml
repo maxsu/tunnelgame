@@ -7,7 +7,7 @@ on:
       - completed
 
 env:
-    GH_TOKEN: ${{github.token}}  # Authenticate gh
+    GH_TOKEN: ${{github.token}} #  Authorize gh
 
 jobs:
   prerelease:
@@ -20,7 +20,9 @@ jobs:
         run: gh run download -p '*' -D artifacts/
 
       - name: Delete old prelease
-        run: gh release delete prerelease --cleanup-tag -y
+        run: |
+          gh release delete prerelease --cleanup-tag -y \
+          || echo No release found! Creating new release...
 
       - name: Create a new prerelease
         run: gh release create prerelease artifacts/*
